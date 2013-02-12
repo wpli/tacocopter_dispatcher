@@ -1,0 +1,8 @@
+#!/usr/bin/python
+if __name__ == '__main__':
+    while( 1 ):
+        inp = raw_input()
+        print inp
+
+
+

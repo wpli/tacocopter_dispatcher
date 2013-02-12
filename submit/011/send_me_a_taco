@@ -1,0 +1,85 @@
+#!/usr/bin/python -u
+import sys
+
+def write_output( string_output ):
+    sys.stdout.write( string_output + "\n" )
+
+def get_start_end( t ):
+    t = t.split()
+    start_x = int( t[0] )
+    end_x = int( t[2] )
+    start_y = int( t[1] )
+    end_y = int( t[3] )
+    return [ start_x, start_y ], [ end_x, end_y ]
+
+def modify_start_end( start, end ):
+    if start[0] < end[0]:
+        start[0] = float( start[0] ) + 0.49999
+        end[0] = float( end[0] ) - 0.49999
+    elif start[0] > end[0]:
+        start[0] = float( start[0] ) - 0.49999
+        end[0] = float( end[0] ) + 0.49999
+
+    if start[1] < end[1]:
+        start[1] = float( start[1] ) + 0.49999
+        end[1] = float( end[1] ) - 0.49999
+    elif start[1] > end[1]:
+        start[1] = float( start[1] ) - 0.49999
+        end[1] = float( end[1] ) + 0.49999
+
+    return [ start, end ]
+
+def greedy( current_pos, city_map ):
+    pass
+
+def parse_map( map_file ):
+    f = open( map_file, 'r' )
+    x = f.read().split('\n') 
+    import pdb
+    # delete the first line
+    del x[0]
+    del x[-1]
+    map_list = []
+    for i in x:
+        row_list = []
+        end_counter = 0
+        for char in i:
+            if i == '#':
+                pass
+            else:
+                row_list.append( char )
+        
+        map_list.append( row_list )
+    return map_list
+
+"""
+Avoid buildings at all costs.
+"""
+if __name__ == '__main__':
+
+    while True:
+        map_file = sys.argv[1]
+        map_list = parse_map( map_file )
+        t = sys.stdin.readline()
+
+        [ start, end ] = get_start_end( t )
+
+        [ start, end ] = modify_start_end( start, end )
+
+
+        #manhattan approach
+        travel_list = []
+        travel_list.append( ( start[0], start[1] ) )
+        if start[0] != end[0] and start[1] != end[1]:
+            travel_list.append( ( end[0], start[1] ) )
+
+        travel_list.append( ( end[0], end[1] ) )
+
+        string_output = " ".join( [ str( x[0] ) + " " + str( x[1] ) for x in travel_list ] )
+
+        write_output(string_output)
+
+
+
+
+    

@@ -1,0 +1,184 @@
+#!/usr/bin/python -u
+import sys
+
+def write_output( string_output ):
+    sys.stdout.write( string_output + "\n" )
+
+def get_start_end( t ):
+    t = t.split()
+    start_x = int( t[0] )
+    end_x = int( t[2] )
+    start_y = int( t[1] )
+    end_y = int( t[3] )
+    return [ start_x, start_y ], [ end_x, end_y ]
+
+def modify_start_end( int_start, int_end ):
+    add_val = 0.5 - 0.1 / 10**5
+    #add_val = 0.0
+
+    start = [ float(i) for i in int_start ]
+    end = [ float(i) for i in int_end ]
+
+    if int_start[0] < int_end[0]:
+        start[0] = float( int_start[0] ) + add_val
+        end[0] = float( int_end[0] ) - add_val
+    elif int_start[0] > int_end[0]:
+        start[0] = float( int_start[0] ) - add_val
+        end[0] = float( int_end[0] ) + add_val
+
+    if int_start[1] < int_end[1]:
+        start[1] = float( int_start[1] ) + add_val
+        end[1] = float( int_end[1] ) - add_val
+    elif int_start[1] > int_end[1]:
+        start[1] = float( int_start[1] ) - add_val
+        end[1] = float( int_end[1] ) + add_val
+
+    return [ start, end ]
+
+def greedy( current_pos, int_end, map_list ):
+    next_pos_vector = int_end[:]
+    next_pos = int_end[:]
+    greedy_direction = [ int_end[0] - current_pos[0], int_end[1] - current_pos[1] ]
+    
+    if greedy_direction[0] > 0:
+        next_pos_vector[0] = 1
+        next_pos[0] = current_pos[0] + 1
+    elif greedy_direction[0] < 0:
+        next_pos_vector[0] = -1
+        next_pos[0] = current_pos[0] - 1
+    else: 
+        next_pos_vector[0] = 0
+        next_pos[0] = current_pos[0]
+
+    if greedy_direction[1] > 0:
+        next_pos_vector[1] = 1
+        next_pos[1] = current_pos[1] + 1
+    elif greedy_direction[1] < 0:
+        next_pos_vector[0] = -1
+        next_pos[1] = current_pos[1] - 1
+    else:
+        next_pos_vector[1] = 0
+        next_pos[1] = current_pos[1]
+
+    # check if there is a building there
+
+    if 0 not in next_pos_vector:
+        
+        # print len( map_list )
+        # for i in map_list:
+        #     print i
+
+        if 1:
+        # print current_pos, next_pos
+        # print map_list.transpose()
+        # print map_list[ next_pos[0] ][current_pos[1] ]
+        # print map_list[ current_pos[0] ][ next_pos[1] ]
+            if map_list[ next_pos[0] ][current_pos[1] ] == 'B':
+                next_pos[0] = current_pos[0]
+            elif map_list[ current_pos[0] ][ next_pos[1] ] == 'B':
+                next_pos[1] = current_pos[1]
+        #except:
+        #    print len( map_list ), [ len(i) for i in map_list ], current_pos, next_pos
+
+    return next_pos
+
+def parse_map( map_file ):
+    # can't cache the map -- a temporary file is used by the validator (clever!)
+    # if "1-simple.map" in map_file: 
+    #     final_map_list = [['#', '#', '#', '#', '#', '#'], ['#', ' ', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', '#'], ['#', ' ', 'B', 'B', ' ', '#'], ['#', ' ', 'B', 'B', ' ', '#'], ['#', ' ', ' ', ' ', ' ', '#'], ['#', ' ', '.', '.', '.', '#'], ['#', ' ', '.', ' ', ' ', '#'], ['#', ' ', '.', 'B', ' ', '#'], ['#', ' ', '.', 'B', ' ', '#'], ['#', 'B', '.', ' ', ' ', '#'], ['#', 'B', '.', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', '#'], ['#', '#', '#', '#', '#', '#']]
+
+    # elif "2-medium.map" in map_file:
+    #     final_map_list = [['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], ['#', ' ', '.', '.', '.', '.', '.', '.', '.', '.', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', '.', '.', '.', '.', '.', '.', '.', '.', ' ', '#'], ['#', ' ', ' ', ' ', '.', ' ', ' ', '.', ' ', ' ', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', '.', '.', '.', '.', '.', '.', '.', '.', ' ', '#'], ['#', ' ', ' ', ' ', '.', ' ', ' ', '.', ' ', ' ', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', 'B', 'B', '.', 'B', 'B', '.', 'B', 'B', ' ', '#'], ['#', ' ', '.', '.', '.', '.', '.', '.', '.', '.', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']]
+    # elif "3-hard.map" in map_file:
+    #     final_map_list = [['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', '.', '.', '.', '.', '.', ' ', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', '.', '.', '.', '.', '.', ' ', '.', 'B', 'B', 'B', ' ', ' ', ' ', ' ', 'B', 'B', 'B', 'B', 'B', 'B', ' ', ' ', ' ', ' ', '.', 'B', ' ', ' ', ' ', '.', '.', '.', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', 'B', 'B', '.', 'B', 'B', ' ', '.', 'B', 'B', 'B', ' ', '.', '.', '.', '.', ' ', ' ', 'B', ' ', ' ', ' ', 'B', ' ', ' ', ' ', 'B', ' ', ' ', ' ', ' ', 'B', ' ', ' ', '.', ' ', '#'], ['#', ' ', ' ', ' ', '.', '.', '.', '.', '.', ' ', '.', 'B', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', ' ', ' ', ' ', 'B', ' ', '.', '.', '.', ' ', ' ', ' ', ' ', 'B', ' ', ' ', '.', ' ', '#'], ['#', ' ', ' ', ' ', 'B', 'B', '.', 'B', 'B', ' ', '.', 'B', ' ', ' ', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', 'B', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', '.', '.', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', '.', '.', '.', '.', '.', ' ', '.', 'B', ' ', ' ', 'B', ' ', '.', '.', '.', ' ', '.', ' ', 'B', ' ', ' ', ' ', ' ', 'B', 'B', 'B', ' ', ' ', ' ', ' ', 'B', ' ', ' ', '.', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', '.', 'B', ' ', ' ', 'B', '.', 'B', '.', 'B', '.', 'B', ' ', 'B', ' ', 'B', 'B', ' ', 'B', '.', ' ', 'B', ' ', ' ', ' ', 'B', ' ', ' ', '.', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', ' ', 'B', ' ', ' ', 'B', '.', 'B', '.', 'B', '.', 'B', ' ', 'B', ' ', 'B', 'B', ' ', 'B', 'B', 'B', 'B', ' ', ' ', '.', '.', '.', ' ', ' ', ' ', '#'], ['#', ' ', '.', '.', ' ', ' ', '.', '.', ' ', 'B', ' ', '.', ' ', ' ', 'B', '.', 'B', '.', '.', ' ', '.', ' ', 'B', ' ', ' ', ' ', ' ', ' ', 'B', ' ', 'B', ' ', ' ', ' ', 'B', ' ', ' ', '.', ' ', '#'], ['#', ' ', ' ', ' ', '.', ' ', ' ', ' ', ' ', 'B', ' ', '.', ' ', '.', 'B', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', ' ', 'B', 'B', ' ', ' ', 'B', ' ', 'B', ' ', ' ', ' ', 'B', ' ', ' ', '.', ' ', '#'], ['#', ' ', ' ', ' ', '.', ' ', 'B', 'B', 'B', 'B', 'B', 'B', ' ', '.', 'B', ' ', 'B', ' ', 'B', ' ', '.', ' ', 'B', ' ', 'B', 'B', ' ', ' ', 'B', ' ', 'B', ' ', ' ', '.', '.', '.', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', '.', ' ', ' ', '.', 'B', ' ', ' ', ' ', ' ', '.', 'B', ' ', 'B', ' ', 'B', ' ', ' ', ' ', 'B', ' ', ' ', ' ', ' ', ' ', 'B', ' ', 'B', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', '.', 'B', '.', '.', 'B', ' ', ' ', 'B', ' ', ' ', 'B', ' ', 'B', ' ', 'B', 'B', 'B', 'B', 'B', ' ', 'B', 'B', ' ', ' ', 'B', 'B', 'B', ' ', ' ', ' ', '.', '.', '.', ' ', ' ', '#'], ['#', ' ', ' ', ' ', '.', '.', '.', '.', 'B', ' ', ' ', 'B', ' ', ' ', 'B', ' ', 'B', ' ', ' ', ' ', '.', '.', '.', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', '.', 'B', '.', ' ', 'B', ' ', ' ', 'B', 'B', ' ', 'B', ' ', 'B', ' ', ' ', ' ', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', ' ', '.', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', 'B', ' ', ' ', ' ', ' ', ' ', 'B', 'B', ' ', 'B', ' ', 'B', ' ', ' ', ' ', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', ' ', '.', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', ' ', 'B', ' ', ' ', ' ', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', ' ', '.', ' ', ' ', ' ', '#'], ['#', ' ', ' ', '.', '.', '.', '.', '.', ' ', ' ', ' ', ' ', '.', ' ', 'B', ' ', 'B', ' ', ' ', ' ', '.', '.', '.', '.', ' ', ' ', '.', '.', ' ', '.', ' ', '.', '.', ' ', ' ', '.', ' ', ' ', ' ', '#'], ['#', ' ', ' ', '.', ' ', 'B', 'B', 'B', 'B', ' ', ' ', ' ', '.', ' ', 'B', 'B', 'B', ' ', ' ', ' ', 'B', 'B', 'B', 'B', ' ', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', ' ', ' ', ' ', ' ', ' ', '#'], ['#', ' ', ' ', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', 'B', 'B', 'B', ' ', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', ' ', ' ', '.', ' ', ' ', '#'], ['#', ' ', ' ', '.', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', 'B', 'B', 'B', ' ', 'B', 'B', 'B', 'B', ' ', 'B', 'B', 'B', 'B', ' ', ' ', '.', ' ', ' ', '#'], ['#', ' ', ' ', '.', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', ' ', ' ', '#'], ['#', ' ', '.', '.', '.', '.', '.', ' ', '.', ' ', ' ', ' ', '.', ' ', ' ', ' ', '.', ' ', ' ', ' ', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', ' ', 'B', 'B', 'B', 'B', ' ', ' ', '.', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', '.', '.', '.', '.', ' ', ' ', ' ', '.', ' ', ' ', ' ', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', ' ', 'B', 'B', 'B', 'B', ' ', ' ', '.', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', 'B', 'B', 'B', 'B', '.', 'B', 'B', 'B', 'B', ' ', 'B', 'B', 'B', 'B', ' ', ' ', '.', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'], ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'] ]
+
+
+    #else:
+    if 1:
+        f = open( map_file, 'r' )
+        x = f.read().split('\n') 
+        f.close()
+
+        # construct the transposed map
+        untransposed_map = [ i for i in x if len( i ) > 0 ]
+        transposed_map = []
+        for idx, i in enumerate( untransposed_map[0] ):
+            column = [ j[idx] for j in untransposed_map ]
+            transposed_map.append( column )
+
+        # map_list = []
+        # for i in x:
+        #     map_list.append( list(i) )
+        #     # row_list = []
+        #     # end_counter = 0
+        #     # for char in i:
+        #     #     if char == '#':
+        #     #         row_list.append( char )
+        #     #     else:
+        #     #         row_list.append( char )
+
+        #     #map_list.append( row_list )
+        # map_numpy = numpy.array( map_list )
+        
+        # print map_numpy
+        # print transposed_map
+
+        #transposed_map = map_numpy.transpose()
+        #print transposed_map
+
+        #final_map_list = list( [ list(i) for i in transposed_map ] )
+            
+    final_map_list = transposed_map
+    #print final_map_list
+    return final_map_list
+
+def get_next_pos( int_current_pos, current_pos, int_end, end, map_list ):
+    #assert int_current_pos == [ int( round(i,0)) for i in current_pos ]
+    #assert int_end == [ int( round(i,0)) for i in end ]
+
+    greedy_next = greedy( int_current_pos, int_end, map_list )
+
+    return greedy_next
+
+"""
+Avoid buildings at all costs, unless it is the start or end
+"""
+if __name__ == '__main__':
+
+    while True:
+        map_file = sys.argv[1]
+        map_list = parse_map( map_file )
+        #import pdb
+        #pdb.set_trace()
+
+        t = sys.stdin.readline()
+        [ int_start, int_end ] = get_start_end( t )
+        [ start, end ] = modify_start_end( int_start, int_end )
+        
+
+        #manhattan approach
+        travel_list = []
+        travel_list.append( start )
+        current_pos = start
+        int_current_pos = [ int( round( i, 0 ) ) for i in current_pos ]
+
+        while ( int_current_pos != int_end ):
+            next_pos = get_next_pos( int_current_pos, current_pos, int_end, end, map_list )
+            current_pos = next_pos
+            int_current_pos = [ int( round( i, 0 ) ) for i in current_pos ]
+
+            if int_current_pos != int_end:
+                travel_list.append( next_pos )
+            else:
+                pass
+
+        travel_list.append( end )
+
+        string_output = " ".join( [ str( x[0] ) + " " + str( x[1] ) for x in travel_list ] )
+
+        write_output(string_output)
+
+
+
+
+    

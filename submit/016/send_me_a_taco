@@ -1,0 +1,146 @@
+#!/usr/bin/python -u
+import sys
+
+def write_output( string_output ):
+    sys.stdout.write( string_output + "\n" )
+
+def get_start_end( t ):
+    t = t.split()
+    start_x = int( t[0] )
+    end_x = int( t[2] )
+    start_y = int( t[1] )
+    end_y = int( t[3] )
+    return [ start_x, start_y ], [ end_x, end_y ]
+
+def modify_start_end( int_start, int_end ):
+    add_val = 0.5 - 0.1 / 10**5
+    #add_val = 0.0
+
+    start = [ float(i) for i in int_start ]
+    end = [ float(i) for i in int_end ]
+
+    if int_start[0] < int_end[0]:
+        start[0] = float( int_start[0] ) + add_val
+        end[0] = float( int_end[0] ) - add_val
+    elif int_start[0] > int_end[0]:
+        start[0] = float( int_start[0] ) - add_val
+        end[0] = float( int_end[0] ) + add_val
+
+    if int_start[1] < int_end[1]:
+        start[1] = float( int_start[1] ) + add_val
+        end[1] = float( int_end[1] ) - add_val
+    elif int_start[1] > int_end[1]:
+        start[1] = float( int_start[1] ) - add_val
+        end[1] = float( int_end[1] ) + add_val
+
+    return [ start, end ]
+
+def greedy( current_pos, int_end, map_list ):
+    next_pos_vector = int_end[:]
+    next_pos = int_end[:]
+    greedy_direction = [ int_end[0] - current_pos[0], int_end[1] - current_pos[1] ]
+    
+    if greedy_direction[0] > 0:
+        next_pos_vector[0] = 1
+        next_pos[0] = current_pos[0] + 1
+    elif greedy_direction[0] < 0:
+        next_pos_vector[0] = -1
+        next_pos[0] = current_pos[0] - 1
+    else: 
+        next_pos_vector[0] = 0
+        next_pos[0] = current_pos[0]
+
+    if greedy_direction[1] > 0:
+        next_pos_vector[1] = 1
+        next_pos[1] = current_pos[1] + 1
+    elif greedy_direction[1] < 0:
+        next_pos_vector[1] = -1
+        next_pos[1] = current_pos[1] - 1
+    else:
+        next_pos_vector[1] = 0
+        next_pos[1] = current_pos[1]
+
+    # check if there is a building there
+    if next_pos_vector == [ 0,0 ]:
+        next_pos = None
+    elif next_pos_vector[0] == 0:
+        # must move vertically; check if there is a building there
+        if map_list[ next_pos[0] ][ next_pos[1] ] == 'B':
+            # if there is a building there, just fly over it to destination
+            next_pos = None
+        else:
+            # proceed vertically
+            pass
+    elif next_pos_vector[1] == 0:
+        # must move horizontally
+        if map_list[ next_pos[0] ][ next_pos[1] ] == 'B':
+            # if there is a building there, just fly over it to destination
+            next_pos = None
+        else:
+            # proceed horizontally
+            pass
+
+    if next_pos == current_pos:
+        next_pos = None
+
+    return next_pos
+
+def parse_map( map_file ):
+    f = open( map_file, 'r' )
+    tmp = f.read()
+    # if len( tmp ) > 3000:
+    #     return None
+    # else:
+    #     x = tmp.split('\n')
+
+    x = tmp.split('\n')
+    f.close()
+    # construct the transposed map
+    untransposed_map = [ i for i in x if len( i ) > 0 ]
+    transposed_map = []
+    for idx, i in enumerate( untransposed_map[0] ):
+        column = [ j[idx] for j in untransposed_map ]
+        transposed_map.append( column )
+    return transposed_map
+
+def get_next_pos( int_current_pos, current_pos, int_end, end, map_list ):
+    #assert int_current_pos == [ int( round(i,0)) for i in current_pos ]
+    #assert int_end == [ int( round(i,0)) for i in end ]
+
+    greedy_next = greedy( int_current_pos, int_end, map_list )
+
+    if greedy_next == None:
+        greedy_next = end
+
+    return greedy_next
+
+"""
+Just a baseline check
+"""
+if __name__ == '__main__':
+    map_file = sys.argv[1]
+    map_list = parse_map( map_file )
+    while True:
+        t = sys.stdin.readline()
+        [ int_start, int_end ] = get_start_end( t )
+        [ start, end ] = modify_start_end( int_start, int_end )
+
+        travel_list = []
+        travel_list.append( start )
+        current_pos = start
+        int_current_pos = [ int( round( i, 0 ) ) for i in current_pos ]
+
+        while ( int_current_pos != int_end ):
+            if map_list != None:
+                next_pos = get_next_pos( int_current_pos, current_pos, int_end, end, map_list )
+                current_pos = next_pos
+                int_current_pos = [ int( round( i, 0 ) ) for i in current_pos ]
+                if int_current_pos != int_end:
+                    travel_list.append( next_pos )
+                else:
+                    break
+
+        travel_list.append( end )
+        string_output = " ".join( [ str( x[0] ) + " " + str( x[1] ) for x in travel_list ] )
+        write_output(string_output)
+

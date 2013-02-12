@@ -1,0 +1,32 @@
+#!/usr/bin/python -u
+import sys
+
+def write_output( string_output ):
+    sys.stdout.write( string_output + "\n" )
+
+if __name__ == '__main__':
+
+    while True:
+        t = sys.stdin.readline()
+        t = t.split()
+        start_x = int( t[0] )
+        end_x = int( t[2] )
+        start_y = int( t[1] )
+        end_y = int( t[3] )
+
+        #manhattan approach
+        travel_list = []
+        travel_list.append( ( start_x, start_y ) )
+        if start_x != end_x and start_y != end_y:
+            travel_list.append( ( end_x, start_y ) )
+
+        travel_list.append( ( end_x, end_y ) )
+
+        string_output = " ".join( [ str( x[0] ) + " " + str( x[1] ) for x in travel_list ] )
+
+        write_output(string_output)
+
+
+
+
+    

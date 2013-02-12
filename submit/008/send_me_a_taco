@@ -1,0 +1,26 @@
+#!/usr/bin/python -u
+import sys
+while True:
+    x = sys.stdin.readline()
+    sys.stdout.write( x.strip() + "\n" )
+    #sys.stdout.write( str(x).rstrip() )
+    #for t in sys.stdin.readline():
+    #    print t
+    # t = t.split()
+    # start_x = int( t[0] )
+    # end_x = int( t[2] )
+    # start_y = int( t[1] )
+    # end_y = int( t[3] )
+
+    # #manhattan approach
+    # travel_list = []
+    # travel_list.append( ( start_x, start_y ) )
+    # travel_list.append( ( end_x, start_y ) )
+    # travel_list.append( ( end_x, end_y ) )
+    # string_output = [ str( x[0] ) + " " + str( x[1] ) for x in travel_list ]
+    # print " ".join( string_output )
+
+
+
+
+    

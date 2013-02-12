@@ -1,0 +1,9 @@
+#!/usr/bin/python
+import sys
+if __name__ == '__main__':
+    taco_map = sys.argv[1]
+    data = sys.stdin.read()
+    print data
+
+
+
